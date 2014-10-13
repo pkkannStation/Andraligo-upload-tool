@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="mainPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aut.view.uploadmovie.UploadMovieViewController">
+   <children>
+      <Label layoutX="21.0" layoutY="20.0" text="Please make sure to choose the correct quality and write the correct title below" AnchorPane.leftAnchor="21.0" AnchorPane.topAnchor="20.0" />
+      <GridPane layoutX="200.0" layoutY="149.0" vgap="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="50.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="275.0" minWidth="10.0" prefWidth="150.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="452.0" minWidth="10.0" prefWidth="420.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Movie file:" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1">
+               <children>
+                  <Button fx:id="browseButton" mnemonicParsing="false" onAction="#handleBrowse" text="Browse..." />
+                  <Label fx:id="urlLabel" />
+               </children>
+            </HBox>
+            <Label text="Title:" GridPane.rowIndex="1" />
+            <Label text="Quality:" GridPane.rowIndex="2" />
+            <TextField fx:id="titleTextField" promptText="Eks. Star Wars Episode 1 - The Phantom Menace" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <ComboBox fx:id="qualityComboBox" prefHeight="26.0" prefWidth="150.0" promptText="Choose" />
+                  <Label fx:id="qualityLabel" />
+               </children>
+            </HBox>
+         </children>
+      </GridPane>
+      <HBox alignment="CENTER" layoutX="251.0" layoutY="214.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
+         <children>
+            <Label text="If you make an error, contact the administrator" />
+            <Button fx:id="clearButton" layoutX="251.0" layoutY="214.0" mnemonicParsing="false" onAction="#handleclear" text="Clear" AnchorPane.rightAnchor="298.0" />
+            <Button fx:id="uploadButton" defaultButton="true" layoutX="205.0" layoutY="220.0" mnemonicParsing="false" onAction="#handleUpload" text="Upload" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="mainPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aut.view.main.MainViewController">
+   <children>
+      <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+         <tabs>
+            <Tab fx:id="uploadMovieTab" text="Upload Movie" />
+            <Tab fx:id="uploadTVShowTab" text="Upload TV Show" />
+            <Tab fx:id="uploadComedyTab" text="Upload Comedy" />
+            <Tab fx:id="uploadMusicTab" text="Upload Music" />
+         </tabs>
+      </TabPane>
+   </children>
+</StackPane>
