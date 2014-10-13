@@ -1,0 +1,41 @@
+import org.apache.tools.ant.filters.*
+apply plugin: 'application'
+
+applicationName = 'FXSampler'
+mainClassName = fxsampler_mainClass
+
+configurations {
+    jdk
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.jdk
+    }
+}
+
+dependencies {
+
+    compile project(':controlsfx')
+    compile project(':fxsampler')
+
+    compile group + ':' + fxsampler_name +':'  + fxsampler_version
+    compile group + ':' + controlsfx_name + ':' + version
+
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        // javafx plugin will provide in this case
+    }
+}
+
+jar {
+    manifest {
+        attributes  'Implementation-Title':     'ControlsFX-Samples',
+                    'Implementation-Version':   project.version,
+                    'Class-Path':               configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class':               fxsampler_mainClass
+    }
+    from sourceSets.main.allJava
+}
+

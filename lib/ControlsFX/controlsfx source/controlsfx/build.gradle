@@ -1,0 +1,140 @@
+import org.apache.tools.ant.filters.EscapeUnicode
+
+dependencies {
+    compile 'org.controlsfx:openjfx-dialogs:1.0.2'
+    try {
+        jdk files(jfxrtJar)
+    } catch (MissingPropertyException pne) {
+        // javafx plugin will provide in this case
+    }
+}
+
+ext {
+    transifex_username = ""
+    transifex_password = ""
+}
+
+configurations {
+    jdk
+    
+    if (project.hasProperty("transifex.username")) {
+        transifex_username = project.property("transifex.username")
+    }
+    if (project.hasProperty("transifex.password")) {
+        transifex_password = project.getProperty("transifex.password")
+    }
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.jdk
+    }
+}
+
+
+task downloadTranslations << {
+    description = "Download translations from Transifex"
+    
+    if (transifex_username.equals("") || transifex_password.equals("")) {
+        logger.warn "----------------------------------------------------------"
+        logger.warn "Cannot determine Transifex Username/Password."
+        logger.warn "If you want to build ControlsFX with its translations then"
+        logger.warn "you need to create a Transifex account and set"
+        logger.warn "transifex.username & transifex.password properties in your" 
+        logger.warn "gradle.properties file." 
+        logger.warn "----------------------------------------------------------"
+    } else {
+        javaexec {
+            main = 'impl.build.transifex.Transifex'
+            classpath = sourceSets.main.runtimeClasspath
+            systemProperty 'transifex.username', transifex_username
+            systemProperty 'transifex.password', transifex_password
+        }
+    }
+}
+
+processResources.finalizedBy(downloadTranslations)
+
+task compileCSS << {
+    ant.delete (includeEmptyDirs: 'true') { 
+        fileset(dir: file("build/resources/main"), includes: "**/*.bss") 
+    }
+    javaexec {
+        main = "com.sun.javafx.tools.packager.Main"
+        classpath = files("${System.properties['java.home']}/../lib/ant-javafx.jar")
+        args = [ "-createbss",
+            "-srcdir", "src/main/resources",
+            "-outdir", "build/resources/main"
+        ]
+    }
+}
+
+processResources.finalizedBy(compileCSS)
+
+javadoc {
+    exclude 'impl/*'
+    //failOnError = true
+    classpath = project.sourceSets.main.runtimeClasspath + configurations.jdk
+    
+    options.windowTitle("ControlsFX Project ${version}")
+    options.links("http://docs.oracle.com/javase/8/docs/api/");
+    options.links("http://docs.oracle.com/javase/8/javafx/api/");
+    options.addBooleanOption("Xdoclint:none").setValue(true);
+    options.overview("${projectDir}/src/main/docs/overview.html");
+    
+    // All doc-files are located in src/main/docs because Gradle's javadoc doesn't copy
+    // over the doc-files if they are embedded with the sources. I find this arrangement
+    // somewhat cleaner anyway (never was a fan of mixing javadoc files with the sources)
+    doLast {
+        copy {
+            from "src/main/docs"
+            into "$buildDir/docs/javadoc"
+        }
+    }
+}
+
+jar {
+    //exclude '**/16/*'
+    exclude '**/32/*'
+    exclude '**/64/*'
+    exclude '**/128/*'
+    exclude '**/oxygen/svg/*'
+    exclude '**/impl/build/**'
+
+    manifest { // the manifest of the default jar is of type OsgiManifest
+        attributes (\
+            'Specification-Title': specification_title,\
+            'Specification-Version': specification_version,\
+            'Implementation-Title': 'ControlsFX',\
+            'Implementation-Version': version,\
+            'Bundle-Name': 'ControlsFX'
+        )
+        instruction 'Bundle-Description', 'High quality UI controls and other tools to complement the core JavaFX distribution'        
+        instruction 'Export-Package',
+                '!impl.org.controlsfx.*',
+                'org.controlsfx.*'
+    }
+}
+
+task native2ascii(type:Copy) {
+    // Files are downloaded with extension utf8.
+    // Here they are unicode escaped then renamed .properties...
+    from ("$buildDir/resources/main") {
+        include('**/controlsfx_*.utf8') 
+        filesMatching("controlsfx_*.utf8") {
+            println "  native2ascii: $name"
+            filter(EscapeUnicode)
+            name = name[0..-6] + '.properties'
+        } 
+    } into "$buildDir/resources/main"
+}
+
+task deleteUtf8Files(type: Delete) {
+    delete fileTree(dir: "$buildDir/resources/main", include: "**/controlsfx_*.utf8")
+}
+
+downloadTranslations.finalizedBy(native2ascii)
+native2ascii.finalizedBy(deleteUtf8Files)
+
+//jar.dependsOn(native2ascii)
+//jar.dependsOn(deleteUtf8Files)
