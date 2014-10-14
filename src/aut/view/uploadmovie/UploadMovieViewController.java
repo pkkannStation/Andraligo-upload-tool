@@ -11,7 +11,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -124,23 +123,10 @@ public class UploadMovieViewController extends View implements Initializable {
     private void handleUpload() {
         if (validate()) {
             this.ftp = new FTPUtil();
-            progress = new SimpleDoubleProperty(0);
-            int progress = 0;
             Runnable task = new Runnable() {
 
                 @Override
                 public void run() {
-//                    CopyStreamAdapter streamListener = new CopyStreamAdapter() {
-//
-//                        @Override
-//                        public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-//                            //this method will be called everytime some bytes are transferred
-//
-//                            double percent = (double) (totalBytesTransferred * 100 / file.length());
-//                            UploadMovieViewController.this.progress.set(percent);
-//                        }
-//
-//                    };
                     UploadMovieViewController.this.ftp.connect();
                     UploadMovieViewController.this.ftp.uploadFile(file, titleTextField.getText(), getFileExtension(file));
                 }
@@ -179,7 +165,7 @@ public class UploadMovieViewController extends View implements Initializable {
                     UploadMovieViewController.this.viewController.showMainView();
                 }
             };
-            viewController.showProgressView(task, this.progress, success, fail, cancel);
+            viewController.showProgressView(task, this.ftp.getProgressProperty(), success, fail, cancel);
         }
     }
 

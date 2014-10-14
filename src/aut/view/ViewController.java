@@ -7,6 +7,7 @@ import aut.view.uploadmovie.UploadMovieViewController;
 import aut.view.wrapper.WrapperViewController;
 import java.io.IOException;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
@@ -107,7 +108,7 @@ public class ViewController {
         return null;
     }
 
-    public void showProgressView(Runnable task, DoubleProperty progress, Runnable success, Runnable fail, Runnable cancel) {
+    public void showProgressView(Runnable task, IntegerProperty progress, Runnable success, Runnable fail, Runnable cancel) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(ViewController.class.getResource("progress/ProgressView.fxml"));

@@ -8,7 +8,7 @@ package aut.view.progress;
 import aut.view.View;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
@@ -22,7 +22,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.dialog.Dialogs;
 
@@ -49,7 +48,7 @@ public class ProgressViewController extends View implements Initializable {
     private Runnable fail;
     private Runnable cancel;
 
-    private DoubleProperty progress;
+    private IntegerProperty progress;
 
     private Service service;
 
@@ -122,7 +121,7 @@ public class ProgressViewController extends View implements Initializable {
         percentLabel.textProperty().bind(service.messageProperty());
     }
 
-    public void start(Runnable task, DoubleProperty progress, Runnable success, Runnable fail, Runnable cancel) {
+    public void start(Runnable task, IntegerProperty progress, Runnable success, Runnable fail, Runnable cancel) {
         this.progress = progress;
         this.task = task;
         this.success = success;
