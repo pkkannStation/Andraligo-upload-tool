@@ -21,7 +21,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import org.apache.commons.net.io.CopyStreamAdapter;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog.Actions;
 import org.controlsfx.dialog.Dialogs;
@@ -53,6 +52,8 @@ public class UploadMovieViewController extends View implements Initializable {
     private File file;
     
     private DoubleProperty progress;
+    
+    private FTPUtil ftp;
 
     /**
      * Initializes the controller class.
@@ -122,31 +123,33 @@ public class UploadMovieViewController extends View implements Initializable {
     @FXML
     private void handleUpload() {
         if (validate()) {
+            this.ftp = new FTPUtil();
             progress = new SimpleDoubleProperty(0);
             int progress = 0;
             Runnable task = new Runnable() {
 
                 @Override
                 public void run() {
-                    CopyStreamAdapter streamListener = new CopyStreamAdapter() {
-
-                        @Override
-                        public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
-                            //this method will be called everytime some bytes are transferred
-
-                            double percent = (double) (totalBytesTransferred * 100 / file.length());
-                            UploadMovieViewController.this.progress.set(percent);
-                        }
-
-                    };
-
-                    FTPUtil.uploadFile(file, titleTextField.getText(), streamListener, getFileExtension(file));
+//                    CopyStreamAdapter streamListener = new CopyStreamAdapter() {
+//
+//                        @Override
+//                        public void bytesTransferred(long totalBytesTransferred, int bytesTransferred, long streamSize) {
+//                            //this method will be called everytime some bytes are transferred
+//
+//                            double percent = (double) (totalBytesTransferred * 100 / file.length());
+//                            UploadMovieViewController.this.progress.set(percent);
+//                        }
+//
+//                    };
+                    UploadMovieViewController.this.ftp.connect();
+                    UploadMovieViewController.this.ftp.uploadFile(file, titleTextField.getText(), getFileExtension(file));
                 }
             };
             Runnable success = new Runnable() {
 
                 @Override
                 public void run() {
+                    UploadMovieViewController.this.ftp.disconnect();
                     Dialogs.create().title("Success").message("Movie got uploaded successfully!").showInformation();
                     UploadMovieViewController.this.viewController.showMainView();
                 }
@@ -155,6 +158,7 @@ public class UploadMovieViewController extends View implements Initializable {
 
                 @Override
                 public void run() {
+                    UploadMovieViewController.this.ftp.disconnect();
                     Dialogs.create().title("Fail").message("Could not upload movie :(").showError();
                     UploadMovieViewController.this.viewController.showMainView();
                 }
@@ -163,6 +167,15 @@ public class UploadMovieViewController extends View implements Initializable {
 
                 @Override
                 public void run() {
+                    Thread th = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            UploadMovieViewController.this.ftp.abort();
+                            UploadMovieViewController.this.ftp.disconnect();
+                        }
+                    });
+                    th.run();
                     UploadMovieViewController.this.viewController.showMainView();
                 }
             };
