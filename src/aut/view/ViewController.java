@@ -1,6 +1,7 @@
 package aut.view;
 
 import aut.control.App;
+import aut.model.MovieRegister;
 import aut.view.main.MainViewController;
 import aut.view.progress.ProgressViewController;
 import aut.view.uploadmovie.UploadMovieViewController;
@@ -23,9 +24,12 @@ public class ViewController {
 
     public final Stage primaryStage;
     public BorderPane wrapper;
+    
+    public MovieRegister movieRegister;
 
-    public ViewController(Stage primaryStage) {
+    public ViewController(Stage primaryStage, MovieRegister movieRegister) {
         this.primaryStage = primaryStage;
+        this.movieRegister = movieRegister;
     }
 
     public void initFrame() {
@@ -85,6 +89,7 @@ public class ViewController {
 
             UploadMovieViewController controller = loader.getController();
             controller.setViewController(this);
+            controller.initContent();
 
             return pane;
         } catch (IOException e) {

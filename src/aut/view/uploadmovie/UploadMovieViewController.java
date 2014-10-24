@@ -5,6 +5,7 @@
  */
 package aut.view.uploadmovie;
 
+import aut.model.Movie;
 import aut.utils.FTPUtil;
 import aut.view.View;
 import java.io.File;
@@ -16,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -40,13 +42,15 @@ public class UploadMovieViewController extends View implements Initializable {
     @FXML
     private Button clearButton;
     @FXML
+    private Button newButton;
+    @FXML
+    private ListView<Movie> searchListView;
+    @FXML
     private TextField titleTextField;
     @FXML
     private ComboBox<String> qualityComboBox;
     @FXML
     private Label urlLabel;
-    @FXML
-    private Label qualityLabel;
 
     private File file;
     
@@ -73,6 +77,13 @@ public class UploadMovieViewController extends View implements Initializable {
                 "720p 3D",
                 "1080p 3D"
         );
+        
+        
+    }
+    
+    public void initContent() {
+        //Set listview
+        searchListView.setItems(viewController.movieRegister.getObservableObjects());
     }
     
     private static String getFileExtension(File file) {
@@ -95,77 +106,29 @@ public class UploadMovieViewController extends View implements Initializable {
     }
 
     private boolean validate() {
-        urlLabel.setTextFill(Color.BLACK);
-        titleTextField.setStyle("");
-        qualityLabel.setText("");
-
         boolean validated = true;
 
         if (file == null) {
-            urlLabel.setTextFill(Color.RED);
-            urlLabel.setText("You need to choose a file to upload...");
             validated = false;
         }
         if (titleTextField.getText().isEmpty()) {
-            titleTextField.setStyle("-fx-background: red");
             validated = false;
         }
         if (qualityComboBox.getSelectionModel().getSelectedIndex() < 0) {
-            qualityLabel.setTextFill(Color.RED);
-            qualityLabel.setText("You need to choose a quality...");
             validated = false;
         }
 
         return validated;
     }
+    
+    private void clear() {
+        
+    }
 
     @FXML
     private void handleUpload() {
         if (validate()) {
-            this.ftp = new FTPUtil();
-            Runnable task = new Runnable() {
-
-                @Override
-                public void run() {
-                    UploadMovieViewController.this.ftp.connect();
-                    UploadMovieViewController.this.ftp.uploadFile(file, titleTextField.getText(), getFileExtension(file));
-                }
-            };
-            Runnable success = new Runnable() {
-
-                @Override
-                public void run() {
-                    UploadMovieViewController.this.ftp.disconnect();
-                    Dialogs.create().title("Success").message("Movie got uploaded successfully!").showInformation();
-                    UploadMovieViewController.this.viewController.showMainView();
-                }
-            };
-            Runnable fail = new Runnable() {
-
-                @Override
-                public void run() {
-                    UploadMovieViewController.this.ftp.disconnect();
-                    Dialogs.create().title("Fail").message("Could not upload movie :(").showError();
-                    UploadMovieViewController.this.viewController.showMainView();
-                }
-            };
-            Runnable cancel = new Runnable() {
-
-                @Override
-                public void run() {
-                    Thread th = new Thread(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            UploadMovieViewController.this.ftp.abort();
-                            UploadMovieViewController.this.ftp.disconnect();
-                        }
-                    });
-                    th.run();
-                    UploadMovieViewController.this.viewController.showMainView();
-                }
-            };
-            viewController.showProgressView(task, this.ftp.getProgressProperty(), success, fail, cancel);
+            
         }
     }
 
@@ -173,15 +136,15 @@ public class UploadMovieViewController extends View implements Initializable {
     private void handleclear() {
         Action response = Dialogs.create().title("Clear?").message("Are you sure you want to clear?").showConfirm();
         if (response == Actions.YES) {
-            urlLabel.setText("");
-            qualityComboBox.getSelectionModel().clearSelection();
-            titleTextField.setText("");
-            urlLabel.setTextFill(Color.BLACK);
-            titleTextField.setStyle("");
-            qualityLabel.setText("");
+            clear();
             this.file = null;
         }
 
+    }
+    
+    @FXML
+    private void handleNew() {
+        
     }
 
 }
